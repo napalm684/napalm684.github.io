@@ -7,17 +7,17 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright ©</copyright>
-    <lastBuildDate>Sun, 29 Sep 2019 20:25:33 -0400</lastBuildDate>
+    <lastBuildDate>Fri, 04 Oct 2019 22:43:05 -0400</lastBuildDate>
     
 	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>test</title>
-      <link>/tags/test/</link>
-      <pubDate>Sun, 29 Sep 2019 20:25:33 -0400</pubDate>
+      <title>general</title>
+      <link>/tags/general/</link>
+      <pubDate>Fri, 04 Oct 2019 22:43:05 -0400</pubDate>
       
-      <guid>/tags/test/</guid>
+      <guid>/tags/general/</guid>
       <description></description>
     </item>
     
