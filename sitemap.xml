@@ -3,6 +3,16 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>/</loc>
+    <lastmod>2019-10-06T19:49:06-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/test/</loc>
+    <lastmod>2019-10-06T19:49:06-04:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/categories/</loc>
     <lastmod>2019-10-04T22:43:05-04:00</lastmod>
   </url>
@@ -19,11 +29,6 @@
   
   <url>
     <loc>/categories/misc/</loc>
-    <lastmod>2019-10-04T22:43:05-04:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/</loc>
     <lastmod>2019-10-04T22:43:05-04:00</lastmod>
   </url>
   
