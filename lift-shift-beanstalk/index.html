@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A high-level overview of what it takes to lift a legacy IIS application to AWS via the Elastic Beanstalk service.">
+    <meta name="author" content="Shawn Patrick Vause">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
+
+    
+    
+    <link rel="stylesheet" href="/styles.d6bb28d519fb8233d0e41fbc8475023696e11fe2e9f314fe589418a7454ed96a.css" />
+
+    <title>Shawn Patrick Vause&#39;s Blog - Lift and Shift Legacy .Net Applications with Elastic Beanstalk</title>
+</head>
+<body><header class="hero">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <h1 class="title has-text-white">
+          Shawn Patrick Vause
+        </h1>
+        <h2 class="subtitle has-text-white">
+          Software is my business, quality is my passion...
+        </h2>
+      </div>
+    </div>
+    
+    <div class="hero-head">
+      <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a role="button" class="navbar-burger burger" 
+               aria-label="menu" aria-expanded="false" data-target="navMenu">
+              <span aria-hidden="true" class="has-text-white"></span>
+              <span aria-hidden="true" class="has-text-white"></span>
+              <span aria-hidden="true" class="has-text-white"></span>
+            </a>
+        </div>
+        
+        <div class="navbar-menu" id="navMenu">
+          <div class="navbar-start">
+            <a href="/" class="navbar-item is-size-3">Home</a>
+            <a class="navbar-item is-size-3">Fun</a>
+            <a class="navbar-item is-size-3">About</a>
+          </div>
+        </div>
+      </nav>    
+    </div>  
+</header>
+<div id="content">
+    <main id="main" class="section">
+        <div class="columns is-centered"><div class="column is-one-fifth is-full-mobile has-text-centered" style="margin-right: 1%;">
+    <img src="/images/profileimage.jpg" 
+         alt="Shawn's Profile Image" 
+         class="profile profile__image" />
+    <p class="professional-description is-hidden-mobile">
+      AWS Certified
+      <br/>
+      Full Stack Software Engineer
+    </p>
+    <div class="social-links">
+      <a href="https://github.com/napalm684" title="GitHub">
+        <i class="fab fa-github-square fa-2x"></i>
+      </a>
+      <a href="https://www.linkedin.com/in/shawn-vause/" title="LinkedIn">
+        <i class="fab fa-linkedin fa-2x"></i>
+      </a>
+      <a href="https://twitter.com/supervause" title="Twitter">
+        <i class="fab fa-twitter-square fa-2x"></i>
+      </a>
+      <a href="https://www.facebook.com/vause" title="Facebook">
+        <i class="fab fa-facebook-square fa-2x"></i>
+      </a>
+      <a href="https://www.instagram.com/napalm684/" title="Instagram">
+        <i class="fab fa-instagram fa-2x"></i>
+      </a>
+    </div>
+    <div>
+      <a href="https://www.certmetrics.com/amazon/public/badge.aspx?i=1&t=c&d=2019-06-21&ci=AWS00932381" target="_blank"
+        title="AWS Certification">
+        <img src="/images/saa-cert-badge.png" 
+        alt="AWS Solutions Architect Associate Badge"
+        class="cert-badge" />
+      </a>
+    </div>
+  </div>
+<div class="column">
+                <div class="container">
+                    <article class="post">
+                    <h2 class="post__title">
+                        <a href="/lift-shift-beanstalk/" class="post__link">Lift and Shift Legacy .Net Applications with Elastic Beanstalk</a>
+                    </h2>
+                    <p class="post__datetime">Oct 08, 2019 12:24PM</p>
+                    <p><p>We live in a world where people like to think things like software and hardware are elegant, well-architected, regimented disciplines necessary to everyday life. As society puts more and more trust in technology how could we not think this? However, real world developers and technicians know better. A high quality facade obscures the inherent ugliness behind these systems that drive many critical processes that impact our day-to-day lives. The UI is only a curtain hiding the complexity and in some cases fragility of processes that have been engineered and potentially patched by countless developers over the years. Welcome to the reality of legacy software.<br />
+<br />
+It is now 2019 and as developers/engineers our companies&rsquo; are looking for us to speed time to market and cut maintenance costs wherever possible. Numbers vary depending on the source utilized, however approximately an estimated 80% of enterprise workloads will be in the cloud by 2020. Remarkably 2020 is only three months away and speaking from experience we have a lot to do at my organization to make this prediction happen, if so desired. Obviously we will not be able to re-architect all business systems into taking full advantage of cloud functionality/economies of scale by this period of time. That is why it is generally accepted by the industry that rehosting, otherwise known as lift and shift, is a best practice for getting applications off legacy on-premises hardware and into the cloud platform of choice. This can result in a variety of benefits including but not necessarily limited to:<br />
+<br/></p>
+
+<ul>
+<li>Managed hardware/software updates</li>
+<li>Managed OS updates/security patching</li>
+<li>Dynamic scalability</li>
+<li>Source controlled infrastructure</li>
+<li>Increased reliability</li>
+<li>Ease of migration to <em>better</em> cloud services in vertical slices</li>
+</ul>
+
+<p><br/>
+Over the past year, I found myself in a position to develop a proof-of-concept solution taking a legacy <code>ASP.Net</code> application with an <code>AngularJS</code> front-end to the AWS platform. While there is a case to be made that this may not have been the best cloud platform choice for this application stack, we are going to ignore that for the sake of this discussion. The goal was to introduce as minimal change as possible, to see what a minimum viable solution would entail. I learned a lot along the way and wanted to document my findings for future similar efforts that will no doubt happen.<br />
+<br/></p>
+
+<p><h3 class="is-size-6 has-text-weight-medium">Getting Started</h3>
+<br />
+So let&rsquo;s set the stage for everyone, what is AWS Elastic Beanstalk? If you want the text book definition go read it <a href="https://aws.amazon.com/elasticbeanstalk/">here</a>. I am going to give you my definition:<br />
+<br />
+<p class="quote">
+Elastic Beanstalk is an orchestration service that abstracts away
+platform implementation details in order to get your application running
+in AWS quickly, easily and with high availability.
+</p>
+<br />
+It&rsquo;s important to make the distinction that this service is not in any way a Platform as a Service (PaaS) offering from AWS. It is only an orchestrator over top of many Infrastructure as a Service (IaaS) offerings, mainly Elastic Compute Cloud (EC2). In the case of an <code>ASP.Net</code> application, we are using it to provision/connect an Application Load Balancer (ALB), a desired number of Windows Server 2016 EC2 instances, an Auto Scaling Groug (ASG), Security Group(s), a Virtual Private Cloud (VPC), and an Elastic Beanstalk Application associated to an environment. Elastic Beanstalk is generally accepted as the &ldquo;quickest&rdquo; way to move your enterprise application to the AWS cloud. <a href="https://aws.amazon.com/lightsail/">Lightsail</a> (beyond the scope of this post) is another service in a similar but different vein.<br />
+<br />
+With that &ldquo;level set&rdquo; out of the way, what should you do first? I took the following approach but your mileage may vary depending on levels of experience with the AWS platform. Going into this effort with very limited AWS understanding, I started how most developers do with a Hello World Elastic Beanstalk solution. The great part about this is AWS built a wizard into the console UI for doing just this. Visit the Elastic Beanstalk service page in the console and follow along:<br />
+<br />
+1) Create an environment<br />
+<a href="/images/lift-shift-beanstalk/1.png"><img src="/images/lift-shift-beanstalk/1.png" alt="create environment" /></a><br />
+<br />
+2) Choose a web server environment for the tier<br />
+<a href="/images/lift-shift-beanstalk/2.png"><img src="/images/lift-shift-beanstalk/2.png" alt="select environment tier" /></a><br />
+<br />
+3) (Optional) If you have applications already defined you may want to create a new application with this link on the top left<br />
+<br />
+<a href="/images/lift-shift-beanstalk/3.png"><img src="/images/lift-shift-beanstalk/3.png" alt="create new application" /></a><br />
+<br />
+4) Configure the application&rsquo;s metadata as desired<br />
+<br />
+<a href="/images/lift-shift-beanstalk/4.png"><img src="/images/lift-shift-beanstalk/4.png" alt="configure metadata" /></a><br />
+<br />
+5) Configure the application itself using <code>.NET (Window/IIS)</code> as the Platform and <code>Sample application</code> as the Application Code and press Create Environment<br />
+<br />
+<a href="/images/lift-shift-beanstalk/5.png"><img src="/images/lift-shift-beanstalk/5.png" alt="configure base configuration" /></a><br />
+<br />
+6) Now we wait for creation to complete<br />
+<br />
+<a href="/images/lift-shift-beanstalk/6.png"><img src="/images/lift-shift-beanstalk/6.png" alt="create status" /></a><br />
+<br />
+Using the URL at the top of the application&rsquo;s page we can visit the site in our browser. It will look like this:<br />
+<br />
+<a href="/images/lift-shift-beanstalk/7.png"><img src="/images/lift-shift-beanstalk/7.png" alt="beanstalk sample" /></a><br />
+<br />
+Congratulations you have created your first Elastic Beanstalk application. So why did I make you do this? After all, we are trying to lift and shift an existing application not create a pretty useless sample page. Well I do have a fairly good reason, I wanted you to understand what exactly Elastic Beanstalk was doing for us. In this way you will have a better appreciation for the component pieces of the application. Under CloudFormation you will find a stack with the prefix <code>awseb-</code> this is your Beanstalk application. Opening this and looking at the resources created will show you all the individual components the orchestration tool provisioned for you. Remember the EC2 instance(s), load balancer etc? Guess what it is all here. You can use the console to look into how all these pieces are tied together, for example how is the load balancer connected to the Beanstalk DNS? Knowing these general components exist and having an appreciation for how they are linked will allow us to tweak settings for rehosting our legacy application appropriately. For that you will have to come pack for part 2 of what I have now determined will be a series of posts!</p>
+ </p>
+                    </article>
+                </div>
+                <a name="commentsBlock"></a>
+                <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "shawn-vause" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+        </div>
+    </main>
+
+        </div><footer class="footer footer-block">
+    <div class="content has-text-centered">
+        <p class="footer-block__text">
+            Copyright ©
+            Shawn Patrick Vause
+            -
+            2019
+        </p>
+    </div>
+</footer>
+
+<script id="dsq-count-scr" src="//shawn-vause.disqus.com/count.js" async></script>
+<script src="/js/nav.js"></script>
+</body>
+</html>

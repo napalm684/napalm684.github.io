@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Shawn Patrick Vause&#39;s Blog</title>
-    <link>/</link>
-    <description>Recent content on Shawn Patrick Vause&#39;s Blog</description>
+    <title>Legacy on Shawn Patrick Vause&#39;s Blog</title>
+    <link>/tags/legacy/</link>
+    <description>Recent content in Legacy on Shawn Patrick Vause&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright ©</copyright>
     <lastBuildDate>Tue, 08 Oct 2019 12:24:32 -0400</lastBuildDate>
     
-	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/legacy/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -19,15 +19,6 @@
       
       <guid>/lift-shift-beanstalk/</guid>
       <description>We live in a world where people like to think things like software and hardware are elegant, well-architected, regimented disciplines necessary to everyday life. As society puts more and more trust in technology how could we not think this? However, real world developers and technicians know better. A high quality facade obscures the inherent ugliness behind these systems that drive many critical processes that impact our day-to-day lives. The UI is only a curtain hiding the complexity and in some cases fragility of processes that have been engineered and potentially patched by countless developers over the years.</description>
-    </item>
-    
-    <item>
-      <title>Hello World!</title>
-      <link>/helloworld/</link>
-      <pubDate>Fri, 04 Oct 2019 22:43:05 -0400</pubDate>
-      
-      <guid>/helloworld/</guid>
-      <description>This is my first post as I am sure you have gathered. Welcome and thank you for stopping by. I plan to use this space largely to document my thoughts and learnings about topics such as Amazon Web Services (AWS), Azure, Docker, Kubernetes (k8s) and I am sure much much more. I was largely inspired by one Scott Hanselman of Microsoft and his blog to document my thoughts. It will help me to organize my learnings and hopefully help out some fellow students of our development craft.</description>
     </item>
     
   </channel>
