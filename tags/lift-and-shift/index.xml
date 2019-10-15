@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright ©</copyright>
-    <lastBuildDate>Tue, 08 Oct 2019 12:24:32 -0400</lastBuildDate>
+    <lastBuildDate>Tue, 15 Oct 2019 08:40:26 -0400</lastBuildDate>
     
 	<atom:link href="https://shawn.vause.us/tags/lift-and-shift/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 2</title>
+      <link>https://shawn.vause.us/lift-shift-beanstalk2/</link>
+      <pubDate>Tue, 15 Oct 2019 08:40:26 -0400</pubDate>
+      
+      <guid>https://shawn.vause.us/lift-shift-beanstalk2/</guid>
+      <description>Welcome back to my lift and shift series. This is part two of a series started here documenting my personal journey lifting an ASP.Net application to the AWS cloud via Elastic Beanstalk. This post will focus on preparing the legacy application for deployment in an AWS based environment.
+Preparation Let&amp;rsquo;s set the stage, we are looking to prove viability of lifting this solution to the cloud. We are not looking to correct sins of the past or refactor major portions of the application.</description>
+    </item>
     
     <item>
       <title>Lift and Shift Legacy .Net Applications with Elastic Beanstalk</title>

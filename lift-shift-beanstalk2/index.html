@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A high-level overview of what it takes to lift a legacy IIS application to AWS via the Elastic Beanstalk service. Part 2 focuses on //TODO">
+    <meta name="author" content="Shawn Patrick Vause">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-150072000-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    <meta property="og:title" content="Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 2" />
+<meta property="og:description" content="A high-level overview of what it takes to lift a legacy IIS application to AWS via the Elastic Beanstalk service. Part 2 focuses on //TODO" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://shawn.vause.us/lift-shift-beanstalk2/" />
+
+<meta property="og:image" content="https://shawn.vause.us/images/default.png" />
+<meta property="article:published_time" content="2019-10-15T08:40:26-04:00" />
+<meta property="article:modified_time" content="2019-10-15T08:40:26-04:00" /><meta property="og:site_name" content="Shawn Patrick Vause&#39;s Blog" />
+
+    <meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://shawn.vause.us/images/default.png"/>
+
+<meta name="twitter:title" content="Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 2"/>
+<meta name="twitter:description" content="A high-level overview of what it takes to lift a legacy IIS application to AWS via the Elastic Beanstalk service. Part 2 focuses on //TODO"/>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
+
+    
+    
+    <link rel="stylesheet" href="/styles.d6bb28d519fb8233d0e41fbc8475023696e11fe2e9f314fe589418a7454ed96a.css" />
+
+    <title>Shawn Patrick Vause&#39;s Blog - Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 2</title>
+</head>
+<body><header class="hero">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <h1 class="title has-text-white">
+          Shawn Patrick Vause
+        </h1>
+        <h2 class="subtitle has-text-white">
+          Software is my business, quality is my passion...
+        </h2>
+      </div>
+    </div>
+    
+    <div class="hero-head">
+      <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a role="button" class="navbar-burger burger" 
+               aria-label="menu" aria-expanded="false" data-target="navMenu">
+              <span aria-hidden="true" class="has-text-white"></span>
+              <span aria-hidden="true" class="has-text-white"></span>
+              <span aria-hidden="true" class="has-text-white"></span>
+            </a>
+        </div>
+        
+        <div class="navbar-menu" id="navMenu">
+          <div class="navbar-start">
+            <a href="/" class="navbar-item is-size-3">Home</a>
+            <a class="navbar-item is-size-3">Fun</a>
+            <a class="navbar-item is-size-3">About</a>
+          </div>
+        </div>
+      </nav>    
+    </div>  
+</header>
+<div id="content">
+    <main id="main" class="section">
+        <div class="columns is-centered"><div class="column is-one-fifth is-full-mobile has-text-centered" style="margin-right: 1%;">
+    <img src="/images/profileimage.jpg" 
+         alt="Shawn's Profile Image" 
+         class="profile profile__image" />
+    <p class="professional-description is-hidden-mobile">
+      AWS Certified
+      <br/>
+      Full Stack Software Engineer
+    </p>
+    <div class="social-links">
+      <a href="https://github.com/napalm684" title="GitHub">
+        <i class="fab fa-github-square fa-2x"></i>
+      </a>
+      <a href="https://www.linkedin.com/in/shawn-vause/" title="LinkedIn">
+        <i class="fab fa-linkedin fa-2x"></i>
+      </a>
+      <a href="https://twitter.com/supervause" title="Twitter">
+        <i class="fab fa-twitter-square fa-2x"></i>
+      </a>
+      <a href="https://www.facebook.com/vause" title="Facebook">
+        <i class="fab fa-facebook-square fa-2x"></i>
+      </a>
+      <a href="https://www.instagram.com/napalm684/" title="Instagram">
+        <i class="fab fa-instagram fa-2x"></i>
+      </a>
+    </div>
+    <div>
+      <a href="https://www.certmetrics.com/amazon/public/badge.aspx?i=1&t=c&d=2019-06-21&ci=AWS00932381" target="_blank"
+        title="AWS Certification">
+        <img src="/images/saa-cert-badge.png" 
+        alt="AWS Solutions Architect Associate Badge"
+        class="cert-badge" />
+      </a>
+    </div>
+  </div>
+<div class="column">
+                <div class="container">
+                    <article class="post">
+                    <h2 class="post__title">
+                        <a href="/lift-shift-beanstalk2/" class="post__link">Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 2</a>
+                    </h2>
+                    <p class="post__datetime">Oct 15, 2019 8:40AM</p>
+                    <p><p>Welcome back to my lift and shift series. This is part two of a series started <a href="/lift-shift-beanstalk">here</a> documenting my personal journey lifting an <code>ASP.Net</code> application to the AWS cloud via Elastic Beanstalk. This post will focus on preparing the legacy application for deployment in an AWS based environment.<br />
+<br />
+<h3 class="is-size-6 has-text-weight-medium">Preparation</h3>
+<br />
+Let&rsquo;s set the stage, we are looking to prove viability of lifting this solution to the cloud. We are not looking to correct sins of the past or refactor major portions of the application. Again the minimum viable solution is what we are seeking. Here is a collection of problems and solutions we had to address (your application will obviously vary):<br />
+<br />
+<strong>1) Configuration of secrets</strong><br />
+I have never personally been a fan of the <code>web.config</code> format used by IIS for configuring application secrets. Environment variables are better, however there is still a very real risk of secrets being compromised on the application server. So what do we do to protect our secrets from malicious actors and ultimately to keep these values out of source control? There are a few potential solutions to this problem in AWS such as <a href="https://aws.amazon.com/secrets-manager/">AWS Secrets Manager</a> and <a href="https://aws.amazon.com/systems-manager/features/#Parameter_Store">SSM Parameter Store</a> which can both be backed by <a href="https://aws.amazon.com/kms/">AWS KMS</a> for encryption. So how does one choose what service to go with? It comes down to two factors features and cost. AWS Secrets Manager supports more robust use cases than SSM Parameter Store including the following:<br />
+<br/></p>
+
+<ul>
+<li>Password generation<br /></li>
+<li>Secrets rotation<br /></li>
+<li>Cross account access<br /></li>
+</ul>
+
+<p><br/>
+Not surprisingly with these added capabilities cost is the second factor. As of writing it costs approximately $0.40 USD per secret stored each month. In addition, an additional $0.05 USD per month is charged for each batch of 10,000 API calls to interact with the secrets. SSM Parameter store incurs no additional charages for standard parameters and $0.05 USD per advanced parameters stored in a month. API interactions are billed at no additional charge for standard and $0.05 USD per 10,000 API interactions in higher throughput scenarios.  Advanced parameters regardless of throughput are billed at the same rate as standard API high throughput interactions are.<br />
+<br />
+<strong>Solution</strong>: SSM Parameter Store, it is cheaper and a lot of our dependencies for the application will remain on-premises. Therefore, a lot of secrets cannot be rotated/generated for these resources. This did require some code updates but they were fairly minimal.<br />
+<br />
+<strong>2) Security/Sign-in Concerns</strong><br />
+Our application will exist in a hybrid state between the cloud and on-premises. At this time it does not make sense to lift and shift our application database or any other internal API dependencies. So luckily/unluckily the application will be able to utilize <a href="https://aws.amazon.com/directconnect/">AWS Direct Connect</a> to reach into our organization&rsquo;s network and connect to these dependencies, including the forms authentication user store for sign-in.<br />
+<br />
+AWS Direct Connect setup is beyond the scope of this article and is not typically managed by the development team, so we will assume availability of this connection by using an already &ldquo;wired-up&rdquo; VPC. DNS routing was also an issue for us and had to be setup with <a href="https://aws.amazon.com/blogs/security/how-to-set-up-dns-resolution-between-on-premises-networks-and-aws-by-using-unbound/">Unbounded DNS</a> to resolve our database and internal URLs (with fully-qualified names), however it was replaced with a managed offering through the course of this effort <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-getting-started.html">AWS Route 53 Resolver</a>. With this networking activity out of the way, we ran into our first road block Microsoft Active Directory (AD).<br />
+<br />
+Some of our internal APIs were secured via Windows Authentication and called via AppPool usernames in IIS. While it is certainly possible to extend your AD environment into the cloud with <a href="https://aws.amazon.com/directoryservice/">AWS Directory Service</a> and the AD Connector, it is not the most cost-effective approach. In addition, the general recommendations from Microsoft are not to use this method for securing APIs, so there was little motivation to continue the bad practices moving forward. We also had integrated authentication using AD users for SQL server sign-in, so this had to be addressed.<br />
+<br />
+<strong>Solution</strong>: Update APIs (code changes) to Open ID Connect client-credentials security. Not only is this a more universally accepted security method for APIs, it is supported by a lot of different vendors including <a href="https://auth0.com/">Auth0</a>, <a href="https://azure.microsoft.com/en-us/services/active-directory/">Azure AD</a> and in AWS <a href="https://aws.amazon.com/cognito/">Amazon Cognito</a>. Luckily in <code>ASP.Net</code> there are standard middleware components and nuget pacakges available to make this job easy as pie. We also transitioned from integrated SQL Server authentication to SQL Server users, and thus broke the AD dependency.<br />
+<br />
+<strong>3) Update Packaged Dependencies (Nuget/NPM etc.)</strong> <em>(Optional, but highly advisable!)</em><br />
+Spend some time updating your nuget packages and NPM dependencies. You are lifting this application to a public cloud platform (albeit with restrictions to accessibility), we want to ensure known security vulnerabilities are taken care of.<br />
+<br />
+<strong>Solution</strong>: Just do it, seriously!<br />
+<br />
+This seems like a great place to end this particular post. With all this initial legwork out of the way, and hopefully some analysis you did in part one from the hello world example, we can begin to make rubber meet the road and start setting up our application in AWS. As a teaser, we will talk about HIPAA compliance, which affects my current employer and how to make a seemingly non-HIPAA compliant service, compliant. Stay tuned!</p>
+ </p>
+                    </article>
+                </div>
+                <a name="commentsBlock"></a>
+                <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "shawn-vause" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+        </div>
+    </main>
+
+        </div><footer class="footer footer-block">
+    <div class="content has-text-centered">
+        <p class="footer-block__text">
+            Copyright ©
+            Shawn Patrick Vause
+            -
+            2019
+        </p>
+    </div>
+</footer>
+
+<script id="dsq-count-scr" src="//shawn-vause.disqus.com/count.js" async></script>
+<script src="/js/nav.js"></script>
+</body>
+</html>
