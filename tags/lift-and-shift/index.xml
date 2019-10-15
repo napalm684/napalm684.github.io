@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Lift and Shift on Shawn Patrick Vause&#39;s Blog</title>
-    <link>/tags/lift-and-shift/</link>
+    <link>https://shawn.vause.us/tags/lift-and-shift/</link>
     <description>Recent content in Lift and Shift on Shawn Patrick Vause&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright ©</copyright>
     <lastBuildDate>Tue, 08 Oct 2019 12:24:32 -0400</lastBuildDate>
     
-	<atom:link href="/tags/lift-and-shift/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://shawn.vause.us/tags/lift-and-shift/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Lift and Shift Legacy .Net Applications with Elastic Beanstalk</title>
-      <link>/lift-shift-beanstalk/</link>
+      <link>https://shawn.vause.us/lift-shift-beanstalk/</link>
       <pubDate>Tue, 08 Oct 2019 12:24:32 -0400</pubDate>
       
-      <guid>/lift-shift-beanstalk/</guid>
+      <guid>https://shawn.vause.us/lift-shift-beanstalk/</guid>
       <description>We live in a world where people like to think things like software and hardware are elegant, well-architected, regimented disciplines necessary to everyday life. As society puts more and more trust in technology how could we not think this? However, real world developers and technicians know better. A high quality facade obscures the inherent ugliness behind these systems that drive many critical processes that impact our day-to-day lives. The UI is only a curtain hiding the complexity and in some cases fragility of processes that have been engineered and potentially patched by countless developers over the years.</description>
     </item>
     
