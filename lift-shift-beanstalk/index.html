@@ -180,7 +180,14 @@ Using the URL at the top of the application&rsquo;s page we can visit the site i
 <br />
 <a href="/images/lift-shift-beanstalk/7.png"><img src="/images/lift-shift-beanstalk/7.png" alt="beanstalk sample" /></a><br />
 <br />
-Congratulations you have created your first Elastic Beanstalk application. So why did I make you do this? After all, we are trying to lift and shift an existing application not create a pretty useless sample page. Well I do have a fairly good reason, I wanted you to understand what exactly Elastic Beanstalk was doing for us. In this way you will have a better appreciation for the component pieces of the application. Under CloudFormation you will find a stack with the prefix <code>awseb-</code> this is your Beanstalk application. Opening this and looking at the resources created will show you all the individual components the orchestration tool provisioned for you. Remember the EC2 instance(s), load balancer etc? Guess what it is all here. You can use the console to look into how all these pieces are tied together, for example how is the load balancer connected to the Beanstalk DNS? Knowing these general components exist and having an appreciation for how they are linked will allow us to tweak settings for rehosting our legacy application appropriately. For that you will have to come pack for part 2 of what I have now determined will be a series of posts!</p>
+Congratulations you have created your first Elastic Beanstalk application. So why did I make you do this? After all, we are trying to lift and shift an existing application not create a pretty useless sample page. Well I do have a fairly good reason, I wanted you to understand what exactly Elastic Beanstalk was doing for us. In this way you will have a better appreciation for the component pieces of the application. Under CloudFormation you will find a stack with the prefix <code>awseb-</code> this is your Beanstalk application. Opening this and looking at the resources created will show you all the individual components the orchestration tool provisioned for you. Remember the EC2 instance(s), load balancer etc? Guess what it is all here. You can use the console to look into how all these pieces are tied together, for example how is the load balancer connected to the Beanstalk DNS? Knowing these general components exist and having an appreciation for how they are linked will allow us to tweak settings for rehosting our legacy application appropriately. For that you will have to come pack for <a href="/lift-shift-beanstalk2">part 2</a> of what I have now determined will be a series of posts!<br />
+<br />
+<h3 class="is-size-6 has-text-weight-medium">Related Posts</h3>
+<br/></p>
+
+<ul>
+<li><a href="/lift-shift-beanstalk2">Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 2</a></li>
+</ul>
  </p>
                     </article>
                 </div>
