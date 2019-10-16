@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A high-level overview of what it takes to lift a legacy IIS application to AWS via the Elastic Beanstalk service. Part 3 focuses on HIPAA compliance and beanstalk configuration for an internal application utilizing direct connect.">
+    <meta name="author" content="Shawn Patrick Vause">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-150072000-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    <meta property="og:title" content="Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 3" />
+<meta property="og:description" content="A high-level overview of what it takes to lift a legacy IIS application to AWS via the Elastic Beanstalk service. Part 3 focuses on HIPAA compliance and beanstalk configuration for an internal application utilizing direct connect." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://shawn.vause.us/lift-shift-beanstalk3/" />
+
+<meta property="og:image" content="https://shawn.vause.us/images/default.png" />
+<meta property="article:published_time" content="2019-10-15T19:02:08-04:00" />
+<meta property="article:modified_time" content="2019-10-15T19:02:08-04:00" /><meta property="og:site_name" content="Shawn Patrick Vause&#39;s Blog" />
+
+    <meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://shawn.vause.us/images/default.png"/>
+
+<meta name="twitter:title" content="Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 3"/>
+<meta name="twitter:description" content="A high-level overview of what it takes to lift a legacy IIS application to AWS via the Elastic Beanstalk service. Part 3 focuses on HIPAA compliance and beanstalk configuration for an internal application utilizing direct connect."/>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
+
+    
+    
+    <link rel="stylesheet" href="/styles.d6bb28d519fb8233d0e41fbc8475023696e11fe2e9f314fe589418a7454ed96a.css" />
+
+    <title>Shawn Patrick Vause&#39;s Blog - Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 3</title>
+</head>
+<body><header class="hero">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <h1 class="title has-text-white">
+          Shawn Patrick Vause
+        </h1>
+        <h2 class="subtitle has-text-white">
+          Software is my business, quality is my passion...
+        </h2>
+      </div>
+    </div>
+    
+    <div class="hero-head">
+      <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a role="button" class="navbar-burger burger" 
+               aria-label="menu" aria-expanded="false" data-target="navMenu">
+              <span aria-hidden="true" class="has-text-white"></span>
+              <span aria-hidden="true" class="has-text-white"></span>
+              <span aria-hidden="true" class="has-text-white"></span>
+            </a>
+        </div>
+        
+        <div class="navbar-menu" id="navMenu">
+          <div class="navbar-start">
+            <a href="/" class="navbar-item is-size-3">Home</a>
+            <a class="navbar-item is-size-3">Fun</a>
+            <a class="navbar-item is-size-3">About</a>
+          </div>
+        </div>
+      </nav>    
+    </div>  
+</header>
+<div id="content">
+    <main id="main" class="section">
+        <div class="columns is-centered"><div class="column is-one-fifth is-full-mobile has-text-centered" style="margin-right: 1%;">
+    <img src="/images/profileimage.jpg" 
+         alt="Shawn's Profile Image" 
+         class="profile profile__image" />
+    <p class="professional-description is-hidden-mobile">
+      AWS Certified
+      <br/>
+      Full Stack Software Engineer
+    </p>
+    <div class="social-links">
+      <a href="https://github.com/napalm684" title="GitHub">
+        <i class="fab fa-github-square fa-2x"></i>
+      </a>
+      <a href="https://www.linkedin.com/in/shawn-vause/" title="LinkedIn">
+        <i class="fab fa-linkedin fa-2x"></i>
+      </a>
+      <a href="https://twitter.com/supervause" title="Twitter">
+        <i class="fab fa-twitter-square fa-2x"></i>
+      </a>
+      <a href="https://www.facebook.com/vause" title="Facebook">
+        <i class="fab fa-facebook-square fa-2x"></i>
+      </a>
+      <a href="https://www.instagram.com/napalm684/" title="Instagram">
+        <i class="fab fa-instagram fa-2x"></i>
+      </a>
+    </div>
+    <div>
+      <a href="https://www.certmetrics.com/amazon/public/badge.aspx?i=1&t=c&d=2019-06-21&ci=AWS00932381" target="_blank"
+        title="AWS Certification">
+        <img src="/images/saa-cert-badge.png" 
+        alt="AWS Solutions Architect Associate Badge"
+        class="cert-badge" />
+      </a>
+    </div>
+  </div>
+<div class="column">
+                <div class="container">
+                    <article class="post">
+                    <h2 class="post__title">
+                        <a href="/lift-shift-beanstalk3/" class="post__link">Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 3</a>
+                    </h2>
+                    <p class="post__datetime">Oct 15, 2019 7:02PM</p>
+                    <p><p><h3 class="is-size-6 has-text-weight-medium">A Note About HIPAA</h3>
+<br />
+There are many services in the AWS cloud platform that are deemed compliant with the Health Insurance Portability and Accountability Act (HIPAA). They are documented <a href="https://d1.awsstatic.com/whitepapers/compliance/AWS_HIPAA_Compliance_Whitepaper.pdf">here</a>. For the uninitiated, HIPAA provides regulations for securing Protected Health Information (PHI) including a patient&rsquo;s name, address, date of birth, social security number and much more. Organizations not adhering to the act are subject to fines and imprisonment, making it a key priority for stewards of this sensitive data. If you examine the whitepaper linked above, you will notice a surprising omission, AWS Elastic Beanstalk. I know what you are thinking, this is a dead stop for HIPAA compliant organizations right? Not exactly, let&rsquo;s dig a little deeper.<br />
+<br />
+At first blush, you would expect not to be able to use the Beanstalk service. However, with a little leg work we come across <a href="https://aws.amazon.com/blogs/apn/how-aws-partners-can-optimize-healthcare-by-orchestrating-hipaa-workloads-on-aws/">this</a> blog post on the AWS Partner Network (APN). In this article, the following assertion is made:<br />
+<br />
+<p class="quote">
+Just because a service is not HIPAA-eligible doesn’t mean that you can’t use it for healthcare applications. In fact, many services you would use as part of a typical DevSecOps architecture pattern are only used to automate and schedule automation activities, and therefore do not store, process, or transmit PHI.  As long as only HIPAA-eligible services are used to store, process, or transmit PHI, you may be able to use orchestration services such as AWS CloudFormation, <em>AWS Elastic Beanstalk</em>, Amazon EC2 Container Service (Amazon ECS), and AWS OpsWorks to assist with HIPAA compliance and security by automating activities that safeguard PHI.
+</p>
+<br />
+In other words, you can achieve HIPAA compliance simply by using HIPAA compliant services for storing, processing and transmitting sensitive PHI. Guess what, we asserted in <a href="/lift-shift-beanstalk">part 1</a> that AWS Elastic Beanstalk is only an orchestrator over Infrastructure as a Service (IaaS) services, specifically EC2 and Elastic Load Balancing which are HIPAA compliant services! Great news, we are back in business with our lift and shift effort. The aforementioned article asserts we can define an internal-facing application (internal application load balancer) with end-to-end encryption. Thus protecting our data in transit. Data at rest is stored on-premises and processed only via locked down EC2 instances with Remote Desktop Protocol (RDP) capabilities disabled. Servers are also only exposed to the internal company network via the direct connect VPC we configure against.<br />
+<br />
+<h3 class="is-size-6 has-text-weight-medium">Desired Architecture</h3>
+<br />
+Below is the architecture we are seeking to build with some omissions for clarity sake, mainly an S3 bucket for code storage, security groups and Route 53 hosted zone changes.<br />
+<br />
+<a href="/images/lift-shift-beanstalk3/1.png"><img src="/images/lift-shift-beanstalk3/1.png" alt="architecture" /></a><br />
+<br />
+In this design, the terms public and private subnets are a bit misleading and used as more of a labeling method. Essentially all the subnets are public to the direct connect/on-premises network. We could optionally tighten the private subnets down with Network Access Control Lists (NACLs), however given this load balancer is an internal load balancer we already have protection from the outside world accessing these servers in any way. In addition, Remote Desktop Protocol (RDP) connections are not allowed so this would be another redundant layer of protection if implemented. The &ldquo;private&rdquo; subnets in this case are labeled as such as there is no way to get to these servers that isn&rsquo;t through the &ldquo;public&rdquo; internal load balancer.<br />
+<br />
+<em>Security Groups (SG)</em><br />
+<br />
+Our design calls for three security groups. For port 22 (SSH), which frankly doesn&rsquo;t make a lot of sense for a Windows server. This port is configured on the VPC security group created by Beanstalk along with desired HTTP port 80 and HTTPS port 443 rules. Port 22 is created automatically since we want to assign an SSH key to the EC2 instances. This is in case a need arises to add an RDP rule for remoting into the server (decrypting the key is how you get the Administrator user password for each instance). As a result Beanstalk creates this SG rule exposing a potential port vulnerability (as of writing we have been unable to prevent this behavior). We chose to map this port&rsquo;s source to a security group with no inbound or outbound rules, effectively stopping port 22 traffic dead in its tracks. The next security group defined is used to route HTTP/HTTPS traffic through the internal load balancer. Inbound rules are defined as follows:<br />
+<br />
+<a href="/images/lift-shift-beanstalk3/2.png"><img src="/images/lift-shift-beanstalk3/2.png" alt="inbound lb rules" /></a><br />
+<br />
+Outbound rules are defined as follows with the source pointing to the SG created for the VPC by Beanstalk (with the original port rules):<br />
+<br />
+<a href="/images/lift-shift-beanstalk3/3.png"><img src="/images/lift-shift-beanstalk3/3.png" alt="outbound lb rules" /></a><br />
+<br />
+Before we move ahead there is a catch here. The load balancer SG is created dynamically at runtime via EbExtensions, which will be discussed in part 4 of this series.<br />
+<br />
+<em>Beanstalk Configuration</em><br />
+<br />
+Software settings are pretty straight forward and we largely ignored other optional features at this time in favor of investigating them later. The defaults were acceptable provided we chose the proper solution stack, which in our case was <code>64bit Windows Server 2016 v2.2.2 running IIS 10.0</code> at the time of writing. Check <a href="https://docs.aws.amazon.com/elasticbeanstalk/latest/platforms/platforms-supported.html#platforms-supported.net">here</a> for the latest .NET on Windows Server with IIS platform versions supported by Elastic Beanstalk. Also as a general FYI, we are using the high availability configuration preset for our application (for load balancing purposes). Be aware this comes with additional costs and you will need to click the &ldquo;Configure more options&rdquo; button on the create new application wizard to set the choice.<br />
+<br />
+<em>Instances</em><br />
+<br />
+Instance types are largely up to you, however we did our initial testing with <code>t3.micro</code> believe it or not. AWS does not recommend this let&rsquo;s be clear, I believe they call out <code>t2.medium</code> as a recommended minimum for Windows. I am here to tell you it is possible with smaller sizes if you are looking to minimize cost (maybe for a dev/test environment not seeing a ton of use). The defaults for CloudWatch and Root volume were fine for us. Next we needed to pay attention to the EC2 security groups. You should place the instances in the VPC security group provisioned by Beanstalk. So if this is a brand new application you are spinning up, do not specify the SG.<br />
+<br />
+<em>Capacity</em><br />
+<br />
+We configured capacity as follows for the auto scaling group:<br />
+<br />
+<a href="/images/lift-shift-beanstalk3/4.png"><img src="/images/lift-shift-beanstalk3/4.png" alt="asg" /></a><br />
+<br />
+Effectively this requires our application to always have one server available, with the capability to scale out to two if auto scaling triggers pass. The scaling cooldown is a period of time before another scale-in/out operation is performed (so you are not constantly spinning stuff up and down). The default scaling triggers were used for the sake of this proof of concept, but adjust as desired:<br />
+<br />
+<a href="/images/lift-shift-beanstalk3/5.png"><img src="/images/lift-shift-beanstalk3/5.png" alt="scaling triggers" /></a><br />
+<br />
+<em>Load Balancer</em><br />
+<br />
+Choose the application load balancer and add ports for HTTP/HTTPS along with the certificate used for the SSL port. Under processes the default should be entered for HTTP with a health check path of the root. You should enter a record for HTTPS and ensure both process definitions are set to stickiness disabled, assuming <a href="https://stackoverflow.com/questions/10494431/sticky-and-non-sticky-sessions">sticky sessions</a> are not important to you. The health check URL can be changed if desired. Essentially this ensures that configured HTTP response codes (200 by default) are achieved at the path specified. If they are not, the instance is unhealthy and a auto-scaling event to replace the unhealthy server is triggered. Lastly, we configured the Rules section as follows to ensure precedence of ports/paths (preferring SSL):<br />
+<br />
+<a href="/images/lift-shift-beanstalk3/6.png"><img src="/images/lift-shift-beanstalk3/6.png" alt="lb priority rules" /></a><br />
+<br />
+<em>Rolling updates and deployments</em><br />
+<br />
+This is a fun section to configure. There are different capabilities available however we chose to use an immutable deployment policy with the following settings:<br />
+<br />
+<a href="/images/lift-shift-beanstalk3/7.png"><img src="/images/lift-shift-beanstalk3/7.png" alt="rolling deployment" /></a><br />
+<br />
+So what does the above give us? We basically are telling the orchestrator on new application deployments to replace servers rather than update in place. This gives us a fresh copy of the AMI (used to setup EC2 for the platform configuration chosen) every time we do a deployment, and it prevents server configuration drift from updates and other sources from introducing problems. We are telling this deployment that it can only replace 50% of the given EC2 instances at a time. For simple Beanstalk configuration changes, we apply them in a rolling fashion one instance at a time (always keeping one instance available) over a ten minute period. This gives Windows intialization activites enough time to complete, which is critical if you chose to use a smaller EC2 instance size. Lastly under preferences, we chose to obey the health check and fail the deployment if the work exceeds 600 seconds.<br />
+<br />
+<em>Security</em><br />
+<br />
+Under security apply the appropriate key pair for the EC2 instances and define an IAM instance profile. This profile is how your server will be able to access AWS services without storing credentials on the actual server. Effectively, the server assumes these capabilities using AWS tooling installed on the base AMI. As for the service role, we let Beanstalk provision that. This provides the server with the abilities to do all the Beanstalk specific tasks it needs to perform: scaling, health checking, etc.<br />
+<br />
+<em>Managed Updates</em><br />
+<br />
+Hang in there we have one more block to touch in the Beanstalk configuration wizard after this. Managed updates if enabled will apply Beanstalk platform updates automatically in a scheduled window. We configured it to be immutable (replacing instances) and allow minor and patch updates to the platform. Be aware you will still want to setup a maintenance window in SSM for Windows security patching. As of this writing, AWS has told me they release platform updates on the cadence of monthly for Windows (see this thread <a href="https://serverfault.com/questions/975661/does-elastic-beanstalk-managed-updates-replace-the-need-for-patch-manager-windo/">here</a>). I will write a future post on Windows patching in AWS at a later date.<br />
+<br />
+<em>Network</em><br />
+<br />
+Ok you made it to the end of the configuration block. This one is fairly easy, you need to use your direct connect VPC, set the load balancer visibility to internal (so it is not publicly accessible in the case of internal applications) and add the load balancer to the &ldquo;public&rdquo; subnet in each chosen availability zone (AZ), thus making it highly available in the event of an failure. Remember always plan for eventual failure, it is a fact of life and technology. Finally, place your instances in the &ldquo;private&rdquo; subnets again across both AZs.</p>
+
+<p>Deploy all those items from above and you should have your infrastructure in place, most likely with the sample hello world app. Congratulations, in our next post we will talk about some additional infrastructure and server side config necessary to drive this to completion along with deploying our code to wrap-up!<br />
+<br />
+<h3 class="is-size-6 has-text-weight-medium">Related Posts</h3>
+<br/></p>
+
+<ul>
+<li><a href="/lift-shift-beanstalk">Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 1</a></li>
+<li><a href="/lift-shift-beanstalk2">Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 2</a></li>
+</ul>
+ </p>
+                    </article>
+                </div>
+                <a name="commentsBlock"></a>
+                <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "shawn-vause" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+        </div>
+    </main>
+
+        </div><footer class="footer footer-block">
+    <div class="content has-text-centered">
+        <p class="footer-block__text">
+            Copyright ©
+            Shawn Patrick Vause
+            -
+            2019
+        </p>
+    </div>
+</footer>
+
+<script id="dsq-count-scr" src="//shawn-vause.disqus.com/count.js" async></script>
+<script src="/js/nav.js"></script>
+</body>
+</html>
