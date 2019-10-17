@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A high-level overview of what it takes to lift a legacy IIS application to AWS via the Elastic Beanstalk service. Part 4 focuses on end-to-end encryption with EbExtensions for HIPAA compliance and deploying our application code to EC2 instances.">
+    <meta name="author" content="Shawn Patrick Vause">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-150072000-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    <meta property="og:title" content="Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 4" />
+<meta property="og:description" content="A high-level overview of what it takes to lift a legacy IIS application to AWS via the Elastic Beanstalk service. Part 4 focuses on end-to-end encryption with EbExtensions for HIPAA compliance and deploying our application code to EC2 instances." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://shawn.vause.us/lift-shift-beanstalk4/" />
+
+<meta property="og:image" content="https://shawn.vause.us/images/default.png" />
+<meta property="article:published_time" content="2019-10-17T15:05:08-04:00" />
+<meta property="article:modified_time" content="2019-10-17T15:05:08-04:00" /><meta property="og:site_name" content="Shawn Patrick Vause&#39;s Blog" />
+
+    <meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://shawn.vause.us/images/default.png"/>
+
+<meta name="twitter:title" content="Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 4"/>
+<meta name="twitter:description" content="A high-level overview of what it takes to lift a legacy IIS application to AWS via the Elastic Beanstalk service. Part 4 focuses on end-to-end encryption with EbExtensions for HIPAA compliance and deploying our application code to EC2 instances."/>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
+
+    
+    
+    <link rel="stylesheet" href="/styles.d6bb28d519fb8233d0e41fbc8475023696e11fe2e9f314fe589418a7454ed96a.css" />
+
+    <title>Shawn Patrick Vause&#39;s Blog - Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 4</title>
+</head>
+<body><header class="hero">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <h1 class="title has-text-white">
+          Shawn Patrick Vause
+        </h1>
+        <h2 class="subtitle has-text-white">
+          Software is my business, quality is my passion...
+        </h2>
+      </div>
+    </div>
+    
+    <div class="hero-head">
+      <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a role="button" class="navbar-burger burger" 
+               aria-label="menu" aria-expanded="false" data-target="navMenu">
+              <span aria-hidden="true" class="has-text-white"></span>
+              <span aria-hidden="true" class="has-text-white"></span>
+              <span aria-hidden="true" class="has-text-white"></span>
+            </a>
+        </div>
+        
+        <div class="navbar-menu" id="navMenu">
+          <div class="navbar-start">
+            <a href="/" class="navbar-item is-size-3">Home</a>
+            <a class="navbar-item is-size-3">Fun</a>
+            <a class="navbar-item is-size-3">About</a>
+          </div>
+        </div>
+      </nav>    
+    </div>  
+</header>
+<div id="content">
+    <main id="main" class="section">
+        <div class="columns is-centered"><div class="column is-one-fifth is-full-mobile has-text-centered" style="margin-right: 1%;">
+    <img src="/images/profileimage.jpg" 
+         alt="Shawn's Profile Image" 
+         class="profile profile__image" />
+    <p class="professional-description is-hidden-mobile">
+      AWS Certified
+      <br/>
+      Full Stack Software Engineer
+    </p>
+    <div class="social-links">
+      <a href="https://github.com/napalm684" title="GitHub">
+        <i class="fab fa-github-square fa-2x"></i>
+      </a>
+      <a href="https://www.linkedin.com/in/shawn-vause/" title="LinkedIn">
+        <i class="fab fa-linkedin fa-2x"></i>
+      </a>
+      <a href="https://twitter.com/supervause" title="Twitter">
+        <i class="fab fa-twitter-square fa-2x"></i>
+      </a>
+      <a href="https://www.facebook.com/vause" title="Facebook">
+        <i class="fab fa-facebook-square fa-2x"></i>
+      </a>
+      <a href="https://www.instagram.com/napalm684/" title="Instagram">
+        <i class="fab fa-instagram fa-2x"></i>
+      </a>
+    </div>
+    <div>
+      <a href="https://www.certmetrics.com/amazon/public/badge.aspx?i=1&t=c&d=2019-06-21&ci=AWS00932381" target="_blank"
+        title="AWS Certification">
+        <img src="/images/saa-cert-badge.png" 
+        alt="AWS Solutions Architect Associate Badge"
+        class="cert-badge" />
+      </a>
+    </div>
+  </div>
+<div class="column">
+                <div class="container">
+                    <article class="post">
+                    <h2 class="post__title">
+                        <a href="/lift-shift-beanstalk4/" class="post__link">Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 4</a>
+                    </h2>
+                    <p class="post__datetime">Oct 17, 2019 3:05PM</p>
+                    <p><p>We&rsquo;ve come a long way in this series, but we have some additional work to do mainly to ensure end-to-end encryption after the application load balancer receives requests. This is necessary to get tighter adherence for HIPAA data transfer security on the AWS VPC network. This ensures even on the VPC, PHI is encrypted in transit. There is a lot of good information on AWS docs about this <a href="https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/configuring-https.html">here</a>, however it is very terse and jumps around a lot. I am going to my best to summarize how I understood all the necessary work to ensure our data security on the network. So let&rsquo;s jump in.<br />
+<br />
+<h3 class="is-size-6 has-text-weight-medium">EbExtensions</h3>
+<br/>
+What exactly are <a href="https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ebextensions.html">EbExtensions</a>? These are configuration files that allow us to perform advanced environment configuration steps on our server(s). We can use them to install software or setup end-to-end encryption with our application. At the root of your solution create an <code>.ebextensions</code> directory for these configuration scripts. Tooling on the EC2 instances will look for this directory and run the necessary scripts it finds with the <code>.config</code> file extension.<br />
+<br />
+The first thing we need to do is <a href="https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/SSLNET.SingleInstance.html">terminate HTTPS on EC2 instances running .Net</a>. To make this happen, we generate a certificate for use in self-signing requests after the AWS Application Load Balancer. I recommend doing this with the bash shell provided by WSL on Windows. A lot of this information was pulled from this <a href="https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/configuring-https.html">documentation</a>. First step, create a <code>password.txt</code> file with a strong randomly generated password value. Step 2, copy this file to a secure S3 bucket. Next run the following commands in order on the bash shell with the openssl package installed:<br />
+<br/></p>
+
+<pre><code>openssl genrsa 2048 &gt; privatekey.pem
+openssl req -new -key ./privatekey.pem -out csr.pem -config ./mycert.cnf -passin pass:$&lt;password value from your file&gt;
+openssl x509 -req -days 365 -in csr.pem -signkey privatekey.pem -out server.crt
+openssl pkcs12 -export -out mycert.pfx -inkey ./privatekey.pem -in ./server.crt -password pass:&lt;password value from your file&gt;
+</code></pre>
+
+<p><br />
+The above Windows certificate <code>.pfx</code> should be uploaded to S3 with the password file. We can now author our first ebextension script. In your <code>.ebextensions</code> directory add a new file and call it <code>1-https-instance-dotnet.config</code>. There is some debate online whether scripts are ran in any particular order, I find it easier to reason about by numerically ordering them. This script will essentially reach out to S3 (so we assume your instance profile has these necessary permissions), download the <code>.pfx</code> and <code>password.txt</code> files we uploaded to the server, clean up existing IIS bindings for the site, install the certificate on the server using the password and certificate files downloaded, create a binding on the IIS site for port 443 using the certificate and finally punch a hole in the firewall on the server for port 443. It does this by using CloudFormation (written in yaml) to write a powershell script to the instances&rsquo; volume and then executes it.<br />
+<br/></p>
+
+<pre><code>files:
+  &quot;C:\\certs\\install-cert.ps1&quot;:
+    content: |
+        import-module webadministration
+        ## Settings - replace the following values with your own
+        $certkey = &quot;mycert.pfx&quot;      ## S3 object key for your PFX certificate
+        $pwdkey = &quot;password.txt&quot;     ## S3 object key for a text file containing the certificate's password
+        ##
+
+        # Set variables
+        $certfile = &quot;C:\cert.pfx&quot;
+        $pwdfile = &quot;C:\certs\pwdcontent&quot;
+        $bucket = &quot;mybucketname&quot;
+
+        Read-S3Object -BucketName $bucket -Key $pwdkey -File $pwdfile
+        $pwd = Get-Content $pwdfile -Raw
+
+        # Clean up existing binding
+        if ( Get-WebBinding &quot;Default Web Site&quot; -Port 443 ) {
+            Echo &quot;Removing WebBinding&quot;
+            Remove-WebBinding -Name &quot;Default Web Site&quot; -BindingInformation *:443:
+        }
+        if ( Get-Item -path IIS:\SslBindings\0.0.0.0!443 ) {
+            Echo &quot;Deregistering WebBinding from IIS&quot;
+            Remove-Item -path IIS:\SslBindings\0.0.0.0!443
+        }
+
+        # Download certificate from S3
+        Read-S3Object -BucketName $bucket -Key $certkey -File $certfile
+
+        # Install certificate
+        Echo &quot;Installing cert...&quot;
+        $securepwd = ConvertTo-SecureString -String $pwd -Force -AsPlainText
+        $cert = Import-PfxCertificate -FilePath $certfile cert:\localMachine\my -Password $securepwd
+
+        # Create site binding
+        Echo &quot;Creating and registering WebBinding&quot;
+        New-WebBinding -Name &quot;Default Web Site&quot; -IP &quot;*&quot; -Port 443 -Protocol https
+        New-Item -path IIS:\SslBindings\0.0.0.0!443 -value $cert -Force
+
+        ## Remove the HTTP binding
+        #Remove-WebBinding -Name &quot;Default Web Site&quot; -BindingInformation *:80:
+
+        # Update firewall
+        netsh advfirewall firewall add rule name=&quot;Open port 443&quot; protocol=TCP localport=443 action=allow dir=OUT
+
+commands:
+  00_install_ssl:
+    command: powershell -NoProfile -ExecutionPolicy Bypass -file C:\\certs\\install-cert.ps1
+</code></pre>
+
+<p><br />
+From here until completion, our scripts are simple CloudFormation yaml files (unlike the previous powershell generating config file). For our next script, we will create the load balancer security group we referred to in an earlier post. Start by creating a new ebextension as follows:<br />
+<br/></p>
+
+<pre><code>option_settings:
+  # Use the custom security group for the load balancer
+  aws:elbv2:loadbalancer:
+    SecurityGroups: '`{ &quot;Ref&quot; : &quot;loadbalancersg&quot; }`'
+    ManagedSecurityGroup: '`{ &quot;Ref&quot; : &quot;loadbalancersg&quot; }`'
+
+Resources:
+  loadbalancersg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: loadbalancer-sg
+      GroupDescription: Load Balancer SG
+      VpcId: 'your vpc id'
+      Tags: 
+        -
+          Key: &quot;Name&quot;
+          Value: &quot;loadbalancer-sg&quot;
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+</code></pre>
+
+<p><br />
+Now let&rsquo;s tell Elastic Beanstalk to re-encrypt the traffic with another configuration script:<br />
+<br/></p>
+
+<pre><code>option_settings:
+  aws:elbv2:listener:443:
+    DefaultProcess: https
+    ListenerEnabled: 'true'
+    Protocol: HTTPS
+  aws:elasticbeanstalk:environment:process:https:
+    Port: '443'
+    Protocol: HTTPS
+</code></pre>
+
+<p><br />
+Finally, tell Elastic Beanstalk to use the new security group:<br />
+<br/></p>
+
+<pre><code>Resources:
+  # Add 443-inbound to instance security group (AWSEBSecurityGroup)
+  httpsFromLoadBalancerSG:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: {&quot;Fn::GetAtt&quot; : [&quot;AWSEBSecurityGroup&quot;, &quot;GroupId&quot;]}
+      IpProtocol: tcp
+      ToPort: 443
+      FromPort: 443
+      SourceSecurityGroupId: {&quot;Fn::GetAtt&quot; : [&quot;loadbalancersg&quot;, &quot;GroupId&quot;]}
+  # Add 443-outbound to load balancer security group (loadbalancersg)
+  httpsToBackendInstances:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: {&quot;Fn::GetAtt&quot; : [&quot;loadbalancersg&quot;, &quot;GroupId&quot;]}
+      IpProtocol: tcp
+      ToPort: 443
+      FromPort: 443
+      DestinationSecurityGroupId: {&quot;Fn::GetAtt&quot; : [&quot;AWSEBSecurityGroup&quot;, &quot;GroupId&quot;]}
+  # Add 80-inbound to instance security group (AWSEBSecurityGroup)
+  httpFromLoadBalancerSG:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: {&quot;Fn::GetAtt&quot; : [&quot;AWSEBSecurityGroup&quot;, &quot;GroupId&quot;]}
+      IpProtocol: tcp
+      ToPort: 80
+      FromPort: 80
+      SourceSecurityGroupId: {&quot;Fn::GetAtt&quot; : [&quot;loadbalancersg&quot;, &quot;GroupId&quot;]}
+  # Add 80-outbound to load balancer security group (loadbalancersg)
+  httpToBackendInstances:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: {&quot;Fn::GetAtt&quot; : [&quot;loadbalancersg&quot;, &quot;GroupId&quot;]}
+      IpProtocol: tcp
+      ToPort: 80
+      FromPort: 80
+      DestinationSecurityGroupId: {&quot;Fn::GetAtt&quot; : [&quot;AWSEBSecurityGroup&quot;, &quot;GroupId&quot;]}
+</code></pre>
+
+<p><br />
+Now your application traffic is completely encrypted from end-to-end. You will notice in IIS the application binding for port 443 is using your self-signed certificate from S3. Pretty awesome right?<br />
+<br />
+<h3 class="is-size-6 has-text-weight-medium">Deploying the Source Code</h3>
+<br />
+Our infrastructure is complete, but it is time to take our application and put it on our servers. Start by compiling and creating a zip file with the following items:
+<br />
+<br/></p>
+
+<ul>
+<li>Compiled application output directory (your publish command output)</li>
+<li><code>aws-windows-deployment-manifest.json</code> at root of zip</li>
+<li><code>.ebextensions</code> directory at root of zip</li>
+</ul>
+
+<p><br />
+Wait, what is this manifest file you are probably asking? Well with every deployment on Elastic Beanstalk, we need a manifest that tells IIS how to setup the applications and virtual directory structure. For instance, if you had a child application or multiple applications on the same server you need to specify this setup. We chose to use the manifest format for an <a href="https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/dotnet-manifest.html">ASP.Net Core application</a> even though this is a full-framework solution. The reason being, is it was simply easier to use. It treated the setup like a file system. There is an <code>msdeploy</code> variant, but it didn&rsquo;t feel worth the added effort as our shop didn&rsquo;t use this anywhere else. Here is what a manifest looks like for a parent child app:<br />
+<br/></p>
+
+<pre><code>{
+  &quot;manifestVersion&quot;: 1,
+  &quot;deployments&quot;: {
+      &quot;aspNetCoreWeb&quot;: [
+      {
+        &quot;name&quot;: &quot;root&quot;,
+        &quot;parameters&quot;: {
+          &quot;appBundle&quot;: &quot;./root&quot;,
+          &quot;iisPath&quot;: &quot;/&quot;,
+          &quot;iisWebSite&quot;: &quot;Default Web Site&quot;
+        }
+      },
+      {
+        &quot;name&quot;: &quot;child&quot;,
+        &quot;parameters&quot;: {
+          &quot;appBundle&quot;: &quot;./child&quot;,
+          &quot;iisPath&quot;: &quot;/child&quot;,
+          &quot;iisWebSite&quot;: &quot;Default Web Site&quot;
+        }
+      }
+    ]
+  }
+}
+</code></pre>
+
+<p><br />
+To upload this zip you can use the UI or script it to be ran from an S3 bucket. For this tutorial we will use the UI. Go to your application and click the upload button on your application&rsquo;s status page:<br />
+<br />
+<a href="/images/lift-shift-beanstalk4/1.png"><img src="/images/lift-shift-beanstalk4/1.png" alt="upload button" /></a><br />
+<br />
+Choose the zip file and give it a label in the dialog below and hit deploy.<br />
+<br />
+<a href="/images/lift-shift-beanstalk4/2.png"><img src="/images/lift-shift-beanstalk4/2.png" alt="upload dialog" /></a><br />
+<br />
+With some waiting you will finally have your application return to healthy status and be accessible by the load balancer URL or custom domain if you went for that extra mile!<br />
+<br />
+<h3 class="is-size-6 has-text-weight-medium">Summary</h3>
+<br />
+With all this work and guidance I hope you successfully lifted and shifted your first full-framework ASP.Net application to AWS. It is not bad after you have done it a couple times, but it is not exactly the most intuitive process either. We did all this work with the console for illustration purposes only. I highly recommend when you nail down your configuration that you invest the time into scripting with an Infrastructure as Code (IaC) solution. We used <a href="https://www.terraform.io/">Terraform</a> and I kind of loved it. CloudFormation is really cryptic by comparison. Anyway, all feedback on this and the series is welcome. Hope it helps out someone else on their journey to the cloud!<br />
+<br />
+<h3 class="is-size-6 has-text-weight-medium">Related Posts</h3>
+<br/></p>
+
+<ul>
+<li><a href="/lift-shift-beanstalk">Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 1</a></li>
+<li><a href="/lift-shift-beanstalk2">Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 2</a></li>
+<li><a href="/lift-shift-beanstalk3">Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 3</a></li>
+</ul>
+ </p>
+                    </article>
+                </div>
+                <a name="commentsBlock"></a>
+                <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "shawn-vause" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+        </div>
+    </main>
+
+        </div><footer class="footer footer-block">
+    <div class="content has-text-centered">
+        <p class="footer-block__text">
+            Copyright ©
+            Shawn Patrick Vause
+            -
+            2019
+        </p>
+    </div>
+</footer>
+
+<script id="dsq-count-scr" src="//shawn-vause.disqus.com/count.js" async></script>
+<script src="/js/nav.js"></script>
+</body>
+</html>

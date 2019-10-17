@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright ©</copyright>
-    <lastBuildDate>Wed, 16 Oct 2019 15:09:08 -0400</lastBuildDate>
+    <lastBuildDate>Thu, 17 Oct 2019 15:05:08 -0400</lastBuildDate>
     
 	<atom:link href="https://shawn.vause.us/tags/cloud/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 4</title>
+      <link>https://shawn.vause.us/lift-shift-beanstalk4/</link>
+      <pubDate>Thu, 17 Oct 2019 15:05:08 -0400</pubDate>
+      
+      <guid>https://shawn.vause.us/lift-shift-beanstalk4/</guid>
+      <description>We&amp;rsquo;ve come a long way in this series, but we have some additional work to do mainly to ensure end-to-end encryption after the application load balancer receives requests. This is necessary to get tighter adherence for HIPAA data transfer security on the AWS VPC network. This ensures even on the VPC, PHI is encrypted in transit. There is a lot of good information on AWS docs about this here, however it is very terse and jumps around a lot.</description>
+    </item>
     
     <item>
       <title>Lift and Shift Legacy .Net Applications with Elastic Beanstalk - Part 3</title>
